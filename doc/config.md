@@ -527,6 +527,8 @@ Database name in the `[database]` section to be used for authentication purposes
 option can be either global or overridden in the connection string if this parameter is
 specified.
 
+### krb_server_keyfile
+
 ## Log settings
 
 ### syslog
