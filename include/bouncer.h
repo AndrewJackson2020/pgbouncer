@@ -222,6 +222,11 @@ extern int cf_sbuf_len;
  */
 #define MAX_PASSWORD    2048
 
+#ifdef HAVE_GSS
+/* Hope this length is long enough for gss config line */
+#define MAX_GSS_CONFIG 1024
+#endif
+
 /*
  * Symbols for authentication type settings (auth_type, hba).
  */
@@ -672,7 +677,7 @@ struct PgSocket {
 	bool wait_for_welcome : 1;	/* client: no server yet in pool, cannot send welcome msg */
 	bool wait_for_user_conn : 1;	/* client: waiting for auth_conn server connection */
 	bool wait_for_user : 1;		/* client: waiting for auth_conn query results */
-	bool wait_for_auth : 1;		/* client: waiting for external auth (PAM) to be completed */
+	bool wait_for_auth : 1;		/* client: waiting for external auth (PAM/GSS) to be completed */
 
 	bool suspended : 1;		/* client/server: if the socket is suspended */
 
@@ -738,6 +743,7 @@ struct PgSocket {
 		gss_buffer_desc client_name;	/* Tempoary */
 		OM_uint32 flags;
 	} gss;
+	char gss_parameters[MAX_GSS_CONFIG];
 #endif
 
 	VarCache vars;		/* state of interesting server parameters */
@@ -835,6 +841,10 @@ extern char *cf_auth_query;
 extern char *cf_auth_user;
 extern char *cf_auth_hba_file;
 extern char *cf_auth_dbname;
+extern char *cf_auth_krb_server_keyfile;
+extern int cf_auth_krb_caseins_users;
+extern int cf_auth_gss_accept_delegation;
+extern char *cf_auth_gss_parameter;
 
 extern char *cf_pidfile;
 
@@ -881,8 +891,6 @@ extern char *cf_server_tls_ca_file;
 extern char *cf_server_tls_cert_file;
 extern char *cf_server_tls_key_file;
 extern char *cf_server_tls_ciphers;
-
-extern char *cf_krb_server_keyfile;
 
 extern int cf_max_prepared_statements;
 

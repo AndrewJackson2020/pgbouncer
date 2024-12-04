@@ -23,4 +23,5 @@
 
 "scramuser3" "baz"
 "user" ""
+"user@EXAMPLE.COM" ""
 "test_error_message_user" ""

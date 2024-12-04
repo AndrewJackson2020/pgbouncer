@@ -378,6 +378,17 @@ static bool finish_set_pool(PgSocket *client, bool takeover)
 		return finish_client_login(client);
 
 	auth = cf_auth_type;
+#ifdef HAVE_GSS
+	if (auth == AUTH_TYPE_GSS) {
+		if (cf_auth_gss_parameter == NULL) {
+			disconnect_client(client, true, "auth_gss_parameter is null");
+			return false;
+		} else {
+			snprintf(client->gss_parameters, MAX_GSS_CONFIG, "%s", cf_auth_gss_parameter);
+			slog_noise(client, "The value of cf_auth_gss_parameter is %s", cf_auth_gss_parameter);
+		}
+	} else
+#endif
 	if (auth == AUTH_TYPE_HBA) {
 		rule = hba_eval(
 			parsed_hba,
@@ -395,6 +406,10 @@ static bool finish_set_pool(PgSocket *client, bool takeover)
 		slog_noise(client, "HBA Line %d is matched", rule->hba_linenr);
 
 		auth = rule->rule_method;
+#ifdef HAVE_GSS
+		if (auth == AUTH_TYPE_GSS)
+			snprintf(client->gss_parameters, MAX_GSS_CONFIG, "%s", rule->auth_options);
+#endif
 	}
 
 	if (auth == AUTH_TYPE_MD5) {
@@ -563,7 +578,7 @@ bool set_pool(PgSocket *client, const char *dbname, const char *username, const 
 		}
 #ifdef HAVE_GSS
 	} else if (cf_auth_type == AUTH_TYPE_GSS) {
-		client->login_user_credentials = add_global_credentials(username, NULL);
+		client->login_user_credentials = add_gss_credentials(username);
 #endif
 	} else {
 		client->login_user_credentials = find_global_credentials(username);
