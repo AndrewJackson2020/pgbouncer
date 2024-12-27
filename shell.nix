@@ -29,6 +29,7 @@ in pkgs.mkShell {
         pkgs.libtool
         pkgs.automake
         pkgs.pam
+        pkgs.postgresql
         pythonPackages
     ];
 }
