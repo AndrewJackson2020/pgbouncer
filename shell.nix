@@ -2,7 +2,7 @@
   pkgs ? import <nixpkgs> {}
 }:
 let
-    pythonPackages = with pkgs.python3Packages; [
+    pythonPackages = with pkgs.python39Packages; [
         pytest
         pytest-asyncio
         pytest-timeout
@@ -25,7 +25,7 @@ in pkgs.mkShell {
         pkgs.openssl
         pkgs.c-ares
         pkgs.systemd
-        pkgs.python3
+        pkgs.python39
         pkgs.libtool
         pkgs.automake
         pkgs.pam
