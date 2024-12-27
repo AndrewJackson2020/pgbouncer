@@ -24,6 +24,9 @@ in pkgs.mkShell {
 	pkgs.cirrus-cli
         pkgs.automake
         pkgs.c-ares
+        pkgs.curl
+        pkgs.cacert
+        pkgs.cmake
         pkgs.libevent
         pkgs.libtool
         pkgs.openssl
