@@ -21,16 +21,17 @@ in pkgs.mkShell {
         pkgs.pkg-config
     ];
     buildInputs = [
-        pkgs.libevent
-        pkgs.openssl
-        pkgs.c-ares
-        pkgs.systemd
-        pkgs.python39
-        pkgs.libtool
+	pkgs.cirrus-cli
         pkgs.automake
+        pkgs.c-ares
+        pkgs.libevent
+        pkgs.libtool
+        pkgs.openssl
         pkgs.pam
-        pkgs.valgrind
         pkgs.postgresql
+        pkgs.python39
+        pkgs.systemd
+        pkgs.valgrind
         pythonPackages
     ];
 }
