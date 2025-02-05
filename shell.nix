@@ -2,7 +2,7 @@
   pkgs ? import <nixpkgs> {}
 }:
 let
-    pythonPackages = with pkgs.python39Packages; [
+    pythonPackages = with pkgs.python311Packages; [
         pytest
         pytest-asyncio
         pytest-timeout
@@ -37,7 +37,7 @@ in pkgs.mkShell {
         pkgs.which
         pkgs.git
         pkgs.postgresql
-        pkgs.python39
+        pkgs.python311
         pkgs.systemd
         pkgs.valgrind
         pythonPackages
