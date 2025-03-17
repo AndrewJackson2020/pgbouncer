@@ -153,9 +153,10 @@ GSS_SUPPORT = get_gss_support()
 
 def get_max_password_length():
     with open("../include/bouncer.h", encoding="utf-8") as f:
-        match = re.search(r"#define MAX_PASSWORD\s+([0-9])", f.read())
+        match = re.search(r"#define MAX_PASSWORD\s+([0-9].*)", f.read())
         assert match is not None
         max_password_length = int(match.group(1))
+        assert max_password_length >= 996
 
     if max_password_length > 996 and PG_MAJOR_VERSION < 14:
         return 996
@@ -164,7 +165,7 @@ def get_max_password_length():
 
 PKT_BUF_SIZE = 4096
 MAX_PASSWORD_LENGTH = get_max_password_length()
-LONG_PASSWORD = "a" * MAX_PASSWORD_LENGTH
+LONG_PASSWORD = "a" * (MAX_PASSWORD_LENGTH - 1)
 
 PG_SUPPORTS_SCRAM = PG_MAJOR_VERSION >= 10
 
