@@ -723,7 +723,9 @@ struct PgSocket {
 		uint8_t ServerKey[32];
 	} scram_state;
 
+#ifdef HAVE_GSS
 	char gss_parameters[MAX_GSS_CONFIG];
+#endif
 
 	VarCache vars;		/* state of interesting server parameters */
 
