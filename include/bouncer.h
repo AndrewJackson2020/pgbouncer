@@ -187,6 +187,7 @@ extern int cf_sbuf_len;
 #include "pam.h"
 #include "gss.h"
 #include "prepare.h"
+#include "ldapauth.h"
 
 #ifndef WIN32
 #define DEFAULT_UNIX_SOCKET_DIR "/tmp"
@@ -222,6 +223,11 @@ extern int cf_sbuf_len;
 #define MAX_GSS_CONFIG 1024
 #endif
 
+#ifdef HAVE_LDAP
+/* Hope this length is long enough for ldap config line */
+#define MAX_LDAP_CONFIG 1024
+#endif
+
 /*
  * Symbols for authentication type settings (auth_type, hba).
  */
@@ -238,6 +244,7 @@ enum auth_type {
 	AUTH_TYPE_CONT_GSS,
 	AUTH_TYPE_PEER,
 	AUTH_TYPE_REJECT,
+	AUTH_TYPE_LDAP,
 };
 
 /* type codes for weird pkts */
@@ -538,6 +545,7 @@ struct PgGlobalUser {
 	int pool_size;	/* max server connections in one pool */
 	int res_pool_size;	/* max additional server connections in one pool */
 
+	usec_t transaction_timeout;	/* how long a user is allowed to stay in transaction before being killed */
 	usec_t idle_transaction_timeout;	/* how long a user is allowed to stay idle in transaction before being killed */
 	usec_t query_timeout;	/* how long a users query is allowed to run before beign killed */
 	usec_t client_idle_timeout;	/* how long is user allowed to idly connect to pgbouncer */
@@ -673,7 +681,7 @@ struct PgSocket {
 	bool wait_for_welcome : 1;	/* client: no server yet in pool, cannot send welcome msg */
 	bool wait_for_user_conn : 1;	/* client: waiting for auth_conn server connection */
 	bool wait_for_user : 1;		/* client: waiting for auth_conn query results */
-	bool wait_for_auth : 1;		/* client: waiting for external auth (PAM/GSS) to be completed */
+	bool wait_for_auth : 1;		/* client: waiting for external auth (PAM/GSS/LDAP) to be completed */
 
 	bool suspended : 1;		/* client/server: if the socket is suspended */
 
@@ -702,6 +710,8 @@ struct PgSocket {
 	PgAddr remote_addr;	/* ip:port for remote endpoint */
 	PgAddr local_addr;	/* ip:port for local endpoint */
 
+	char *host;
+
 	union {
 		struct DNSToken *dns_token;	/* ongoing request */
 		PgDatabase *db;			/* cache db while doing auth query */
@@ -722,6 +732,9 @@ struct PgSocket {
 		uint8_t StoredKey[32];
 		uint8_t ServerKey[32];
 	} scram_state;
+#ifdef HAVE_LDAP
+	char ldap_parameters[MAX_LDAP_CONFIG];
+#endif
 
 #ifdef HAVE_GSS
 	char gss_parameters[MAX_GSS_CONFIG];
@@ -808,6 +821,7 @@ extern usec_t cf_cancel_wait_timeout;
 extern usec_t cf_client_idle_timeout;
 extern usec_t cf_client_login_timeout;
 extern usec_t cf_idle_transaction_timeout;
+extern usec_t cf_transaction_timeout;
 extern bool any_user_level_timeout_set;
 extern bool any_user_level_client_timeout_set;
 extern int cf_server_round_robin;
@@ -827,6 +841,7 @@ extern char *cf_auth_krb_server_keyfile;
 extern int cf_auth_krb_caseins_users;
 extern int cf_auth_gss_accept_delegation;
 extern char *cf_auth_gss_parameter;
+extern char *cf_auth_ldap_parameter;
 
 extern char *cf_pidfile;
 
@@ -919,7 +934,7 @@ static inline char *cstr_skip_ws(char *p)
 }
 
 
-void load_config(void);
+bool load_config(void);
 
 
 bool set_config_param(const char *key, const char *val);

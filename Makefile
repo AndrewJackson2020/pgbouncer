@@ -15,6 +15,7 @@ pgbouncer_SOURCES = \
 	src/objects.c \
 	src/pam.c \
 	src/gss.c \
+	src/ldapauth.c \
 	src/pktbuf.c \
 	src/pooler.c \
 	src/proto.c \
@@ -46,6 +47,7 @@ pgbouncer_SOURCES = \
 	include/objects.h \
 	include/pam.h \
 	include/gss.h \
+	include/ldapauth.h \
 	include/pktbuf.h \
 	include/pooler.h \
 	include/proto.h \
@@ -71,7 +73,7 @@ pgbouncer_SOURCES = \
 	include/common/uthash_lowercase.h
 
 UTHASH = uthash
-pgbouncer_CPPFLAGS = -Iinclude $(CARES_CFLAGS) $(LIBEVENT_CFLAGS) $(TLS_CPPFLAGS)
+pgbouncer_CPPFLAGS = -Iinclude $(CARES_CFLAGS) $(LIBEVENT_CFLAGS) $(TLS_CPPFLAGS) $(LDAP_CFLAGS)
 pgbouncer_CPPFLAGS += -I$(UTHASH)/src
 
 # include libusual sources directly
