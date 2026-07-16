@@ -374,6 +374,36 @@ static bool fill_defaults(struct LoaderCtx *ctx)
 		if (!cf_set(ctx->cf, ctx->cur_sect, k->key_name, k->def_value))
 			goto fail;
 	}
+
+	/* Check env vars */
+	for (k = s->key_list; k->key_name; k++) {
+		char* env_var_name;
+
+		/* build env var name */
+		env_var_name_head = env_var_name = malloc(strlen("PGBOUNCER_") + strlen(ctx->cur_sect) + strlen("_") + strlen(k->key_name))
+		strcpy(env_var_name, "PGBOUNCER_");
+		strcat(env_var_name, ctx->cur_sect);
+		strcpy(env_var_name, "_");
+		strcat(env_var_name, k->key_name);
+		char *s = env_var_name_head;
+		while (*s) {
+			*s = toupper((unsigned char) *s);
+			s++;
+		}
+
+		char* env_value = getenv(env_var_name_head);
+
+		free(env_var_name_head)
+
+		if (!env_value || (k->flags & CF_READONLY))
+			continue;
+		if ((k->flags & CF_NO_RELOAD) && ctx->cf->loaded)
+			continue;
+
+		if (!cf_set(ctx->cf, ctx->cur_sect, k->key_name, env_value))
+			goto fail;
+	}
+
 	return true;
 fail:
 	log_error("fill_defaults fail");
