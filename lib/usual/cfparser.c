@@ -378,9 +378,10 @@ static bool fill_defaults(struct LoaderCtx *ctx)
 	/* Check env vars */
 	for (k = s->key_list; k->key_name; k++) {
 		char* env_var_name;
+		char* env_var_name_head;
 
 		/* build env var name */
-		env_var_name_head = env_var_name = malloc(strlen("PGBOUNCER_") + strlen(ctx->cur_sect) + strlen("_") + strlen(k->key_name))
+		env_var_name_head = env_var_name = malloc(strlen("PGBOUNCER_") + strlen(ctx->cur_sect) + strlen("_") + strlen(k->key_name));
 		strcpy(env_var_name, "PGBOUNCER_");
 		strcat(env_var_name, ctx->cur_sect);
 		strcpy(env_var_name, "_");
@@ -393,7 +394,7 @@ static bool fill_defaults(struct LoaderCtx *ctx)
 
 		char* env_value = getenv(env_var_name_head);
 
-		free(env_var_name_head)
+		free(env_var_name_head);
 
 		if (!env_value || (k->flags & CF_READONLY))
 			continue;

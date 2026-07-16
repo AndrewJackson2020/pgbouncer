@@ -8,6 +8,8 @@
 
 struct Config1 {
 	char *str1;
+	char *str2;
+	char *str3;
 	char *def1;
 	int int1;
 	int bool1;
@@ -93,6 +95,8 @@ end:
 #define CF_REL_BASE struct Config1
 static const struct CfKey rkeys1 [] = {
 	CF_REL("str1", CF_STR, str1, 0, NULL),
+	CF_REL("str2", CF_STR, str1, 0, "anotherdefault"),
+	CF_REL("str3", CF_STR, str1, 0, NULL),
 	CF_REL("def1", CF_STR, def1, 0, NULL),
 	CF_REL("int", CF_INT, int1, 0, NULL),
 	CF_REL("bool", CF_BOOL, bool1, 0, NULL),
@@ -131,10 +135,15 @@ static void test_rel(void *ptr)
 
 	cleanup();
 
+	putenv("ONE_STR2=envvaroverride");
+	putenv("ONE_STR3=ignoredenvvaroverride");
+
 	int_check(1, cf_load_file(&cfdesc2, fn));
 
 	str_check(cf1.str1, "val1");
 	tt_assert(cf1.def1 == NULL);
+	tt_assert(cf1.str2 == "envvaroverride");
+	tt_assert(cf1.str3 == "valuefromconfig");
 	str_check(cf2.str2, "val2");
 	str_check(cf2.def2, "somedefault");
 
