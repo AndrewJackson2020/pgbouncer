@@ -394,7 +394,7 @@ endif
 gssopt = get_option('gss')
 gss = not_found_dep
 if gssopt != 'disabled'
-  gss = cc.find_library('gssapi_krb5', required: gssopt == 'enabled', has_headers: ['gssapi.h'])
+  gss = cc.find_library('gssapi_krb5', required: gssopt == 'enabled', has_headers: ['gssapi.h', 'gssapi_ext.h'])
 endif
 if gss.found()
   cdata.set('HAVE_GSS', 1, description: 'GSS support.')
