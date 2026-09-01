@@ -754,6 +754,7 @@ summary({
   'adns': adns,
   'ldap': ldap.found(),
   'pam': pam.found(),
+  'gss': gss.found(),
   'systemd': systemd.found(),
   'tls': openssl.found(),
   'cassert': get_option('cassert'),
