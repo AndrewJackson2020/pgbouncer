@@ -564,6 +564,7 @@ pgbouncer_sources = files(
   'src/client.c',
   'src/dnslookup.c',
   'src/hba.c',
+  'src/gss.c',
   'src/janitor.c',
   'src/ldapauth.c',
   'src/loader.c',
@@ -611,6 +612,7 @@ pgbouncer_deps = [
   openssl,
   systemd,
   pam,
+  gss,
   ldap,
   threads,
 ] + dns_deps + net_deps
